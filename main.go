@@ -1,7 +1,7 @@
 package main
 
 import (
-	"huntsman/cmd"
+	"trafczar/cmd"
 )
 
 func main() {
