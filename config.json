@@ -1,8 +1,0 @@
-{
-"mongo_uri" : "",
-"mongo_username":"",
-"mongo_password":"",
-"mongo_database":"",
-"mongo_collection":"",
-"js_file_path":""
-}

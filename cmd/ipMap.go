@@ -11,8 +11,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"trafczar/config"
-	mongodb "trafczar/db"
+	"github.com/souvikhaldar/trafczar/config"
+	mongodb "github.com/souvikhaldar/trafczar/db"
 
 	"github.com/spf13/cobra"
 	"go.mongodb.org/mongo-driver/bson"
@@ -82,10 +82,11 @@ var ipCmd = &cobra.Command{
 					}
 
 					ip, err := ParseIPFromTcpDump(scanner.Text())
-					if err != nil {
+					if err != nil || len(ip) == 0{
 						fmt.Println(err)
 						continue
 					}
+
 					fmt.Println("Request came from: ", ip)
 
 					if cacheRes, ok := ipCache[ip]; ok {

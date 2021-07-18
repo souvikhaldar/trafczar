@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
-	"trafczar/config"
+	"github.com/souvikhaldar/trafczar/config"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"trafczar/cmd"
+	"github.com/souvikhaldar/trafczar/cmd"
 )
 
 func main() {
