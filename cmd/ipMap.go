@@ -68,6 +68,7 @@ var ipCmd = &cobra.Command{
 
 		ipCache := make(map[string]*Response)
 		if readStream {
+			fmt.Println("Port is: ", port)
 			var cmd *exec.Cmd
 			if port == "80" {
 				cmd = exec.Command("sh", "-c", "sudo tcpdump -i any port 80 | cut -d ' ' -f 5")
@@ -367,7 +368,11 @@ func getIPInfo(ip string) (Response, error) {
 }
 
 func ParseIPFromTcpDump(tcpDump string) (string, error) {
-	return tcpDump[:strings.LastIndex(tcpDump, ":")], nil
+	pos := strings.LastIndex(tcpDump, ".")
+	if pos == 0 || pos >= len(tcpDump) {
+		return "", fmt.Errorf("pos of last . is out of range: %d", pos)
+	}
+	return tcpDump[:pos], nil
 	// NOTE: THis is the old logic for old command- sudo tcpdump -s 0 -A 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420'
 
 	//split := strings.Split(tcpDump, "\n")
