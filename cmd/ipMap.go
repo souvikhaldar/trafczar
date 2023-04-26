@@ -71,7 +71,7 @@ var ipCmd = &cobra.Command{
 			var cmd *exec.Cmd
 			if port == "80" {
 				cmd = exec.Command("sh", "-c", "sudo tcpdump -i any port 80 | cut -d ' ' -f 5")
-			} else if port == "443" {
+			} else {
 				cmd = exec.Command("sh", "-c", "sudo tcpdump -i any port 443 | grep 'In' | cut -d ' ' -f 7")
 			}
 			stdOut, err := cmd.StdoutPipe()
