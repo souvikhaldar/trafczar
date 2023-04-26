@@ -83,10 +83,7 @@ var ipCmd = &cobra.Command{
 			go func() {
 				for scanner.Scan() {
 					var response Response
-					if !strings.Contains(scanner.Text(), "IP") {
-						continue
-					}
-
+					fmt.Println("Incoming request: ", scanner.Text())
 					ip, err := ParseIPFromTcpDump(scanner.Text())
 					if err != nil || len(ip) == 0 {
 						fmt.Println(err)
