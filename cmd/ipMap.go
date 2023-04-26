@@ -288,8 +288,8 @@ var ipCmd = &cobra.Command{
 
 		// plain IP passing
 		response, err := getIPInfo(ipAdd)
-		if err != nil {
-			fmt.Println(err)
+		if err != nil || response.Status == "fail"{
+			//fmt.Println(err)
 			return
 		}
 		fmt.Printf("Details of the IP:\n %+v \n", response)
