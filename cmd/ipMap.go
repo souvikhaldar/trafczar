@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
 	"github.com/souvikhaldar/trafczar/config"
 	mongodb "github.com/souvikhaldar/trafczar/db"
 
@@ -41,13 +42,14 @@ var ipAdd string
 var readStream bool
 var conf string
 var persist bool
+var port string
 
 func init() {
 	rootCmd.AddCommand(ipCmd)
 	ipCmd.Flags().StringVarP(&tcpDump, "tcp-dump", "t", "", "source file of tcpdump")
 	ipCmd.Flags().StringVar(&ipAdd, "ip", "", "IP address of the target")
 	ipCmd.Flags().BoolVarP(&readStream, "read-stream", "s", false, "Do you want to read from tcpdump output contineously?")
-
+	ipCmd.Flags().StringVar(&port, "port", "80", "Port address to listen on")
 	ipCmd.PersistentFlags().StringVarP(&conf, "config", "c", "", "The path to the configuration JSON file")
 	ipCmd.Flags().BoolVarP(&persist, "persist", "p", false, "Do you want to store the response to mongo? If yes, please provide value to --config flag")
 }
@@ -66,8 +68,12 @@ var ipCmd = &cobra.Command{
 
 		ipCache := make(map[string]*Response)
 		if readStream {
-			cmd := exec.Command("sh", "-c", "sudo tcpdump -s 0 -A 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420'")
-
+			var cmd *exec.Cmd
+			if port == "80" {
+				cmd = exec.Command("sh", "-c", "sudo tcpdump -i any port 80 | cut -d ' ' -f 5")
+			} else if port == "443" {
+				cmd = exec.Command("sh", "-c", "sudo tcpdump -i any port 443 | grep 'In' | cut -d ' ' -f 7")
+			}
 			stdOut, err := cmd.StdoutPipe()
 			if err != nil {
 				fmt.Println(err)
@@ -82,7 +88,7 @@ var ipCmd = &cobra.Command{
 					}
 
 					ip, err := ParseIPFromTcpDump(scanner.Text())
-					if err != nil || len(ip) == 0{
+					if err != nil || len(ip) == 0 {
 						fmt.Println(err)
 						continue
 					}
@@ -166,7 +172,7 @@ var ipCmd = &cobra.Command{
 						context.TODO(),
 						response,
 					); err != nil {
-						fmt.Println("Error in inserting to mongo: ", err)
+						fmt.Println("error in inserting to mongo: ", err)
 					} else {
 						fmt.Println("Inserted to mongo")
 					}
@@ -271,7 +277,7 @@ var ipCmd = &cobra.Command{
 							context.TODO(),
 							response,
 						); err != nil {
-							fmt.Println("Error in inserting to mongo: ", err)
+							fmt.Println("error in inserting to mongo: ", err)
 						} else {
 							fmt.Println("Inserted to mongo")
 						}
@@ -288,7 +294,7 @@ var ipCmd = &cobra.Command{
 
 		// plain IP passing
 		response, err := getIPInfo(ipAdd)
-		if err != nil || response.Status == "fail"{
+		if err != nil || response.Status == "fail" {
 			//fmt.Println(err)
 			return
 		}
@@ -297,7 +303,7 @@ var ipCmd = &cobra.Command{
 		//	context.TODO(),
 		//	response,
 		//); err != nil {
-		//	fmt.Println("Error in inserting to mongo: ", err)
+		//	fmt.Println("error in inserting to mongo: ", err)
 		//} else {
 		//	fmt.Println("Insert ID: ", insertRes.InsertedID)
 		//}
@@ -334,7 +340,7 @@ var ipCmd = &cobra.Command{
 			context.TODO(),
 			response,
 		); err != nil {
-			fmt.Println("Error in inserting to mongo: ", err)
+			fmt.Println("error in inserting to mongo: ", err)
 		} else {
 			fmt.Println("Inserted to mongo")
 		}
@@ -357,28 +363,31 @@ func getIPInfo(ip string) (Response, error) {
 	}
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		fmt.Println("Error in unmarshalling response: ", err)
+		fmt.Println("error in unmarshalling response: ", err)
 		return response, err
 	}
 	return response, err
 }
 
 func ParseIPFromTcpDump(tcpDump string) (string, error) {
-	split := strings.Split(tcpDump, "\n")
-	if len(split) == 0 {
-		return "", fmt.Errorf("Error in parsing tcpdump output: %s", "split")
-	}
-	newSplit := strings.SplitAfter(split[0], ">")[0]
-	sliceSplit := strings.Fields(newSplit)
-	if len(sliceSplit) < 3 {
-		return "", fmt.Errorf("Error in parsing tcpdump output: %s", "sliceSplit")
-	}
-	lastDot := strings.LastIndex(sliceSplit[2], ".")
-	if lastDot == -1 {
-		return "", fmt.Errorf("Error in parsing tcpdump output: %s", "lastDot")
-	}
-	if len(sliceSplit[2]) < lastDot {
-		return "", fmt.Errorf("Error in parsing tcpdump output: %s", "lastDot length")
-	}
-	return sliceSplit[2][:lastDot], nil
+	return tcpDump[:strings.LastIndex(tcpDump, ":")], nil
+	// NOTE: THis is the old logic for old command- sudo tcpdump -s 0 -A 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420'
+
+	//split := strings.Split(tcpDump, "\n")
+	//if len(split) == 0 {
+	//	return "", fmt.Errorf("error in parsing tcpdump output: %s", "split")
+	//}
+	//newSplit := strings.SplitAfter(split[0], ">")[0]
+	//sliceSplit := strings.Fields(newSplit)
+	//if len(sliceSplit) < 3 {
+	//	return "", fmt.Errorf("error in parsing tcpdump output: %s", "sliceSplit")
+	//}
+	//lastDot := strings.LastIndex(sliceSplit[2], ".")
+	//if lastDot == -1 {
+	//	return "", fmt.Errorf("error in parsing tcpdump output: %s", "lastDot")
+	//}
+	//if len(sliceSplit[2]) < lastDot {
+	//	return "", fmt.Errorf("error in parsing tcpdump output: %s", "lastDot length")
+	//}
+	//return sliceSplit[2][:lastDot], nil
 }
