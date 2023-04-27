@@ -371,7 +371,7 @@ func ParseIPFromTcpDump(tcpDump string) (string, error) {
 	if pos == 0 || pos >= len(tcpDump) {
 		return "", fmt.Errorf("pos of last . is out of range: %d", pos)
 	}
-	if net.ParseIP(tcpDump) == nil {
+	if net.ParseIP(tcpDump[:pos]) == nil {
 		return "", fmt.Errorf("not an IP: %s", tcpDump)
 	}
 	return tcpDump[:pos], nil
