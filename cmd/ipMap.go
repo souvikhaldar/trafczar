@@ -69,7 +69,6 @@ var ipCmd = &cobra.Command{
 
 		ipCache := make(map[string]*Response)
 		if readStream {
-			fmt.Println("Port is: ", port)
 			var cmd *exec.Cmd
 			if port == "80" {
 				cmd = exec.Command("sh", "-c", "sudo tcpdump -i any port 80 | cut -d ' ' -f 5")
@@ -85,7 +84,6 @@ var ipCmd = &cobra.Command{
 			go func() {
 				for scanner.Scan() {
 					var response Response
-					fmt.Println("Incoming request: ", scanner.Text())
 					ip, err := ParseIPFromTcpDump(scanner.Text())
 					if err != nil || len(ip) == 0 {
 						continue
@@ -96,7 +94,6 @@ var ipCmd = &cobra.Command{
 						cacheRes.Hits += 1
 
 						if !persist || cacheRes.Status == "fail" || len(cacheRes.Status) == 0 {
-							fmt.Println("--------------------------------------------------------------------------------")
 							continue
 						}
 
