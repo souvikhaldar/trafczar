@@ -67,7 +67,7 @@ var ipCmd = &cobra.Command{
 		}
 
 		ipCache := make(map[string]*Response)
-		if readStream {
+		for readStream {
 			fmt.Println("Port is: ", port)
 			var cmd *exec.Cmd
 			if port == "80" {
@@ -129,7 +129,7 @@ var ipCmd = &cobra.Command{
 					response, err = getIPInfo(ip)
 					if err != nil {
 						fmt.Println(err)
-						return
+						continue
 					}
 					// insert to cache
 					ipCache[ip] = &response
@@ -138,7 +138,7 @@ var ipCmd = &cobra.Command{
 						response)
 
 					if !persist || response.Status == "fail" || len(response.Status) == 0 {
-						return
+						continue
 					}
 
 					updateRes, err := mongodb.MongoIPCollection.UpdateOne(
@@ -184,7 +184,6 @@ var ipCmd = &cobra.Command{
 				log.Fatal(err)
 			}
 
-			return
 		}
 
 		if tcpDump != "" {
