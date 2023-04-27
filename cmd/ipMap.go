@@ -87,6 +87,10 @@ var ipCmd = &cobra.Command{
 					var response Response
 					fmt.Println("Incoming request: ", scanner.Text())
 					ip, err := ParseIPFromTcpDump(scanner.Text())
+					if err == fmt.Errorf("not an IP: %s", tcpDump) {
+						continue
+					}
+
 					if err != nil || len(ip) == 0 {
 						fmt.Println(err)
 						fmt.Println("--------------------------------------------------------------------------------")
@@ -97,9 +101,6 @@ var ipCmd = &cobra.Command{
 
 					if cacheRes, ok := ipCache[ip]; ok {
 						cacheRes.Hits += 1
-						fmt.Printf(
-							"Details of the IP:\n %+v \n",
-							cacheRes)
 
 						if !persist || cacheRes.Status == "fail" || len(cacheRes.Status) == 0 {
 							fmt.Println("--------------------------------------------------------------------------------")
