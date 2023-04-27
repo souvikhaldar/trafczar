@@ -87,10 +87,6 @@ var ipCmd = &cobra.Command{
 					var response Response
 					fmt.Println("Incoming request: ", scanner.Text())
 					ip, err := ParseIPFromTcpDump(scanner.Text())
-					if err == fmt.Errorf("not an IP: %s", scanner.Text()) {
-						continue
-					}
-
 					if err != nil || len(ip) == 0 {
 						fmt.Println(err)
 						fmt.Println("--------------------------------------------------------------------------------")
@@ -372,7 +368,8 @@ func ParseIPFromTcpDump(tcpDump string) (string, error) {
 		return "", fmt.Errorf("pos of last . is out of range: %d", pos)
 	}
 	if net.ParseIP(tcpDump[:pos]) == nil {
-		return "", fmt.Errorf("not an IP: %s", tcpDump)
+		// it is not an IP, ignore
+		return "", nil
 	}
 	return tcpDump[:pos], nil
 	// NOTE: THis is the old logic for old command- sudo tcpdump -s 0 -A 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420'
