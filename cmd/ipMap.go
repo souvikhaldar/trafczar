@@ -94,14 +94,12 @@ var ipCmd = &cobra.Command{
 					fmt.Println("Request came from: ", ip)
 
 					if cacheRes, ok := ipCache[ip]; ok {
-						fmt.Println("Cache hit")
 						cacheRes.Hits += 1
 						fmt.Printf(
 							"Details of the IP:\n %+v \n",
 							cacheRes)
 
 						if !persist || cacheRes.Status == "fail" || len(cacheRes.Status) == 0 {
-							fmt.Println("Can't store to db")
 							continue
 						}
 
@@ -122,7 +120,6 @@ var ipCmd = &cobra.Command{
 							fmt.Println("Could not update: ", err)
 							continue
 						}
-						fmt.Println("Updated in mongo")
 						continue
 					}
 
@@ -158,9 +155,7 @@ var ipCmd = &cobra.Command{
 						fmt.Println("Could not update: ", err)
 						continue
 					}
-					fmt.Println("Updated: ", updateRes.UpsertedCount)
 					if updateRes.UpsertedCount > 0 {
-						fmt.Println("Updated to mongo")
 						continue
 
 					}
@@ -171,8 +166,6 @@ var ipCmd = &cobra.Command{
 						response,
 					); err != nil {
 						fmt.Println("error in inserting to mongo: ", err)
-					} else {
-						fmt.Println("Inserted to mongo")
 					}
 					fmt.Println("-----------------------")
 				}
