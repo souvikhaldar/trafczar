@@ -88,14 +88,12 @@ var ipCmd = &cobra.Command{
 					fmt.Println("Incoming request: ", scanner.Text())
 					ip, err := ParseIPFromTcpDump(scanner.Text())
 					if err != nil || len(ip) == 0 {
-						fmt.Println(err)
-						fmt.Println("--------------------------------------------------------------------------------")
 						continue
 					}
 
+					// Cache hit
 					if cacheRes, ok := ipCache[ip]; ok {
 						cacheRes.Hits += 1
-						fmt.Println("Request came from IP: ", ip)
 
 						if !persist || cacheRes.Status == "fail" || len(cacheRes.Status) == 0 {
 							fmt.Println("--------------------------------------------------------------------------------")
