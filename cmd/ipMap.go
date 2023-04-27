@@ -88,6 +88,7 @@ var ipCmd = &cobra.Command{
 					ip, err := ParseIPFromTcpDump(scanner.Text())
 					if err != nil || len(ip) == 0 {
 						fmt.Println(err)
+						fmt.Println("--------------------------------------------------------------------------------")
 						continue
 					}
 
@@ -100,6 +101,7 @@ var ipCmd = &cobra.Command{
 							cacheRes)
 
 						if !persist || cacheRes.Status == "fail" || len(cacheRes.Status) == 0 {
+							fmt.Println("--------------------------------------------------------------------------------")
 							continue
 						}
 
@@ -118,6 +120,7 @@ var ipCmd = &cobra.Command{
 						)
 						if err != nil {
 							fmt.Println("Could not update: ", err)
+							fmt.Println("--------------------------------------------------------------------------------")
 							continue
 						}
 						continue
@@ -126,6 +129,7 @@ var ipCmd = &cobra.Command{
 					response, err = getIPInfo(ip)
 					if err != nil {
 						fmt.Println(err)
+						fmt.Println("--------------------------------------------------------------------------------")
 						continue
 					}
 					// insert to cache
@@ -135,6 +139,7 @@ var ipCmd = &cobra.Command{
 						response)
 
 					if !persist || response.Status == "fail" || len(response.Status) == 0 {
+						fmt.Println("--------------------------------------------------------------------------------")
 						continue
 					}
 
@@ -153,11 +158,12 @@ var ipCmd = &cobra.Command{
 					)
 					if err != nil {
 						fmt.Println("Could not update: ", err)
+						fmt.Println("--------------------------------------------------------------------------------")
 						continue
 					}
 					if updateRes.UpsertedCount > 0 {
 						continue
-
+						fmt.Println("--------------------------------------------------------------------------------")
 					}
 
 					response.Hits = 1
@@ -167,7 +173,7 @@ var ipCmd = &cobra.Command{
 					); err != nil {
 						fmt.Println("error in inserting to mongo: ", err)
 					}
-					fmt.Println("-----------------------")
+					fmt.Println("--------------------------------------------------------------------------------")
 				}
 			}()
 			if err := cmd.Start(); err != nil {
