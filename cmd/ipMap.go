@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -369,6 +370,9 @@ func ParseIPFromTcpDump(tcpDump string) (string, error) {
 	pos := strings.LastIndex(tcpDump, ".")
 	if pos == 0 || pos >= len(tcpDump) {
 		return "", fmt.Errorf("pos of last . is out of range: %d", pos)
+	}
+	if net.ParseIP(tcpDump) == nil {
+		return "", fmt.Errorf("not an IP: %s", tcpDump)
 	}
 	return tcpDump[:pos], nil
 	// NOTE: THis is the old logic for old command- sudo tcpdump -s 0 -A 'tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x47455420'
