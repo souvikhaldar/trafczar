@@ -127,7 +127,7 @@ var ipCmd = &cobra.Command{
 					// insert to cache
 					ipCache[ip] = &response
 					fmt.Printf(
-						"Details of the IP:\n %+v \n",
+						"Request coming from:\n %+v \n",
 						response)
 
 					if !persist || response.Status == "fail" || len(response.Status) == 0 {
