@@ -67,7 +67,7 @@ var ipCmd = &cobra.Command{
 		}
 
 		ipCache := make(map[string]*Response)
-		for readStream {
+		if readStream {
 			fmt.Println("Port is: ", port)
 			var cmd *exec.Cmd
 			if port == "80" {
